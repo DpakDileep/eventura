@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, {useState } from "react";
 import {
   Button,
   Col,
@@ -230,9 +230,6 @@ export default function EventDetails() {
                     >
                       Update
                     </Button>
-                  </div>
-                  <div className="text-center mt-4">
-                    <a href="">Have Assistence ?</a>
                   </div>
                 </>
               ) : (
