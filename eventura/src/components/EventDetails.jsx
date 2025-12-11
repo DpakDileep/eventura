@@ -41,7 +41,7 @@ export default function EventDetails() {
   const [tickets, setTickets] = useState(
     JSON.parse(localStorage.getItem("tickets")) || []
   );
-  let index = 0;
+  const filteredTickets = tickets.filter((t) => t.eventId == event.id);
 
   function handleShowModal() {
     if (isLoggedIn === true) {
@@ -377,20 +377,19 @@ export default function EventDetails() {
         contentClassName="rounded-0"
       >
         <Modal.Body className="p-5 ">
-          <Table bordered className="text-center" variant="dark">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Tickets</th>
-                <th>Ticket ID</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tickets
-                .filter((t) => t.eventId == event.id)
-                .map((t, i) => (
+          {filteredTickets.length > 0 ? (
+            <Table bordered className="text-center" variant="dark">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Tickets</th>
+                  <th>Ticket ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTickets.map((t, i) => (
                   <tr key={i}>
                     <td>{i + 1}</td>
                     <td>{t.userFirstName + t.userLastName}</td>
@@ -399,8 +398,11 @@ export default function EventDetails() {
                     <td>{t.ticketId}</td>
                   </tr>
                 ))}
-            </tbody>
-          </Table>
+              </tbody>
+            </Table>
+          ) : (
+            <h1>No Tickets Found</h1>
+          )}
           <Button
             className=" position-absolute top-0 end-0 m-1 rounded-circle btn-danger"
             onClick={handleHideModal}
