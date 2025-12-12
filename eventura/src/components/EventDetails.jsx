@@ -401,7 +401,7 @@ export default function EventDetails() {
               </tbody>
             </Table>
           ) : (
-            <h1>No Tickets Found</h1>
+            <h1 className="text-center">No Registered Attendees</h1>
           )}
           <Button
             className=" position-absolute top-0 end-0 m-1 rounded-circle btn-danger"

@@ -7,6 +7,7 @@ import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import signupImage from "../assets/images/signup-image.png";
 import { useNavigate } from "react-router-dom";
+import { Toast, ToastContainer } from "react-bootstrap";
 
 export default function Signup() {
   const [validated, setValidated] = useState(false);
@@ -18,30 +19,41 @@ export default function Signup() {
     email: "",
     password: "",
   });
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState(
+    JSON.parse(localStorage.getItem("users")) || []
+  );
+  const [showToast, setShowToast] = useState(false);
 
   const handleSubmit = (event) => {
+    const allEmail = users.map((u) => u.email);
+
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
+      console.log(allEmail);
     } else {
       event.preventDefault();
-      setUsers([...users, user]);
-      setUser({
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-      });
-      const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
-      const updateUser=[...existingUsers,user]
-      localStorage.setItem("users", JSON.stringify(updateUser));
-      sessionStorage.setItem("isLoggedIn", "true");
-      sessionStorage.setItem("currentUser", JSON.stringify(user));
-      navigate("/", { state: { message: "Account created successfully!" } });
+
+      if (allEmail.includes(user.email)) {
+        setShowToast(true);
+      } else {
+        setUsers([...users, user]);
+        setUser({
+          firstName: "",
+          lastName: "",
+          email: "",
+          password: "",
+        });
+        const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
+        const updateUser = [...existingUsers, user];
+        localStorage.setItem("users", JSON.stringify(updateUser));
+        sessionStorage.setItem("isLoggedIn", "true");
+        sessionStorage.setItem("currentUser", JSON.stringify(user));
+        navigate("/", { state: { message: "Account created successfully!" } });
+      }
+      setValidated(true);
     }
-    setValidated(true);
   };
 
   function handleChange(event) {
@@ -53,6 +65,24 @@ export default function Signup() {
       className="d-flex justify-content-center align-items-center"
       style={{ minHeight: "calc(100vh - 108px)", marginTop: "80px" }}
     >
+      <ToastContainer
+        position="top-end"
+        className="p-3"
+        style={{ marginTop: "90px" }}
+      >
+        <Toast
+          onClose={() => setShowToast(false)}
+          show={showToast}
+          delay={3000}
+          autohide
+          bg="warning"
+        >
+          <Toast.Body className="bi bi-exclamation-triangle">
+            {" "}
+            This email already exists
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
       <Card style={{ width: "80%", maxWidth: "900px" }}>
         <Row className="g-0">
           <Col md={6}>
