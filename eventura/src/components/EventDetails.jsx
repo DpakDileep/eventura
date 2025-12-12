@@ -10,6 +10,7 @@ import {
   Image,
   Toast,
   ToastContainer,
+  Table,
 } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -32,12 +33,15 @@ export default function EventDetails() {
   }
 
   const [show, setShow] = useState(false);
+  const [listshow, setListShow] = useState(false);
+  const [listTost, setlistToast] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [tickets, setTickets] = useState(
     JSON.parse(localStorage.getItem("tickets")) || []
   );
+  const filteredTickets = tickets.filter((t) => t.eventId == event.id);
 
   function handleShowModal() {
     if (isLoggedIn === true) {
@@ -48,8 +52,14 @@ export default function EventDetails() {
   }
   function handleHideModal() {
     setShow(false);
+    setListShow(false);
   }
 
+  function handlelistmodal() {
+    if (isLoggedIn == true) {
+      setListShow(true);
+    }
+  }
   function calculateTotal() {
     if (event.price.toLowerCase() === "free") {
       return 0;
@@ -91,8 +101,11 @@ export default function EventDetails() {
     <>
       <Container
         className="d-flex justify-content-center"
-        style={{ paddingTop: "140px", position: "relative",overflow: "hidden" }}
-        
+        style={{
+          paddingTop: "140px",
+          position: "relative",
+          overflow: "hidden",
+        }}
       >
         <div
           style={{
@@ -196,7 +209,6 @@ export default function EventDetails() {
                   </Toast>
                 </ToastContainer>
               )}
-
               <h4 style={{ marginBottom: "16px" }}>Event Details</h4>
 
               <p style={{ marginBottom: "8px" }}>
@@ -213,22 +225,29 @@ export default function EventDetails() {
               </p>
               {ownEvent ? (
                 <>
-                  <div className="d-flex justify-content-between mx-5">
+                  <div className="d-flex justify-content-between mx-3">
+                    <Button
+                      variant="primary"
+                      className=" mt-3 fw-bold py-2 bi bi-people-fill"
+                      onClick={handlelistmodal}
+                    >
+                      Attendees
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      className=" mt-3 fw-bold py-2 bi bi-pencil text-light"
+                      onClick={() => {
+                        navigate("/create-event", { state: { value: event } });
+                      }}
+                    >
+                      Update
+                    </Button>
                     <Button
                       variant="danger"
                       className=" mt-3 fw-bold py-2 bi bi-trash"
                       onClick={() => handleDelete(event.id)}
                     >
                       Delete
-                    </Button>
-                    <Button
-                      variant="warning"
-                      className=" mt-3 fw-bold py-2 bi bi-pencil"
-                      onClick={() => {
-                        navigate("/create-event", { state: { value: event } });
-                      }}
-                    >
-                      Update
                     </Button>
                   </div>
                 </>
@@ -253,10 +272,7 @@ export default function EventDetails() {
         aria-labelledby="example-custom-modal-styling-title"
         contentClassName="rounded-0"
       >
-        <ToastContainer
-          position="top-center"
-          className="p-3 mt-2"
-        >
+        <ToastContainer position="top-center" className="p-3 mt-2">
           <Toast
             onClose={() => setShowAlert(false)}
             show={showAlert}
@@ -264,7 +280,8 @@ export default function EventDetails() {
             autohide
             bg="warning"
           >
-            <Toast.Body className="text-light bi bi-exclamation-triangle">{" "}
+            <Toast.Body className="text-light bi bi-exclamation-triangle">
+              {" "}
               Please select atleast 1 ticket
             </Toast.Body>
           </Toast>
@@ -350,6 +367,48 @@ export default function EventDetails() {
               </div>
             </Col>
           </Row>
+        </Modal.Body>
+      </Modal>
+      <Modal
+        show={listshow}
+        onHide={handleHideModal}
+        size="xl"
+        aria-labelledby="example-custom-modal-styling-title"
+        contentClassName="rounded-0"
+      >
+        <Modal.Body className="p-5 ">
+          {filteredTickets.length > 0 ? (
+            <Table bordered className="text-center" variant="dark">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Tickets</th>
+                  <th>Ticket ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTickets.map((t, i) => (
+                  <tr key={i}>
+                    <td>{i + 1}</td>
+                    <td>{t.userFirstName + t.userLastName}</td>
+                    <td>{t.userEmail}</td>
+                    <td>{t.quantity}</td>
+                    <td>{t.ticketId}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          ) : (
+            <h1>No Tickets Found</h1>
+          )}
+          <Button
+            className=" position-absolute top-0 end-0 m-1 rounded-circle btn-danger"
+            onClick={handleHideModal}
+          >
+            X
+          </Button>
         </Modal.Body>
       </Modal>
     </>
